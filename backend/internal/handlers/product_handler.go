@@ -195,6 +195,49 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, product)
 }
 
+func (h *ProductHandler) UpdateOrderStatus(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	orderID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid order id UUID"})
+		return
+	}
+
+	var req struct {
+		Status string `json:"status"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Status == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "valid status is required"})
+		return
+	}
+
+	if err := h.repo.UpdateOrderStatus(r.Context(), orderID, req.Status); err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed updating order status: " + err.Error()})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"order_id": orderID,
+		"status":   req.Status,
+		"updated":  true,
+	})
+}
+
+func (h *ProductHandler) InspectVectors(w http.ResponseWriter, r *http.Request) {
+	items, err := h.repo.InspectVectors(r.Context())
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"count": len(items),
+		"index": "HNSW (cosine_ops, m=16, ef_construction=64)",
+		"items": items,
+	})
+}
+
+
 
 
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {

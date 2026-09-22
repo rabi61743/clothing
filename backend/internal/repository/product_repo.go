@@ -515,4 +515,51 @@ func (r *ProductRepository) CreateProduct(ctx context.Context, req models.Create
 	return r.GetProductBySlug(ctx, req.Slug)
 }
 
+func (r *ProductRepository) UpdateOrderStatus(ctx context.Context, orderID uuid.UUID, newStatus string) error {
+	_, err := r.db.Pool.Exec(ctx, `
+		UPDATE orders SET status = $1 WHERE id = $2
+	`, newStatus, orderID)
+	return err
+}
+
+type VectorInspectItem struct {
+	ProductID    uuid.UUID `json:"product_id"`
+	ProductName  string    `json:"product_name"`
+	Brand        string    `json:"brand"`
+	SKU          string    `json:"sku"`
+	VectorDim    int       `json:"vector_dim"`
+	SampleVector []float32 `json:"sample_vector"`
+}
+
+func (r *ProductRepository) InspectVectors(ctx context.Context) ([]VectorInspectItem, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT p.id, p.name, p.brand, p.sku, pe.embedding
+		FROM product_embeddings pe
+		JOIN products p ON pe.product_id = p.id
+		ORDER BY p.name ASC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []VectorInspectItem
+	for rows.Next() {
+		var it VectorInspectItem
+		var vec pgvector.Vector
+		if err := rows.Scan(&it.ProductID, &it.ProductName, &it.Brand, &it.SKU, &vec); err == nil {
+			slice := vec.Slice()
+			it.VectorDim = len(slice)
+			if len(slice) >= 6 {
+				it.SampleVector = slice[:6] // First 6 dimensions as sample
+			} else {
+				it.SampleVector = slice
+			}
+			items = append(items, it)
+		}
+	}
+	return items, nil
+}
+
+
 

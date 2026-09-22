@@ -85,7 +85,9 @@ func main() {
 		r.Post("/search/semantic", productHandler.SearchSemantic)
 		r.Get("/orders", productHandler.ListOrders)
 		r.Post("/orders", productHandler.CreateOrder)
+		r.Patch("/orders/{id}/status", productHandler.UpdateOrderStatus)
 		r.Get("/admin/stats", productHandler.GetAdminStats)
+		r.Get("/admin/vector/inspect", productHandler.InspectVectors)
 	})
 
 	server := &http.Server{
