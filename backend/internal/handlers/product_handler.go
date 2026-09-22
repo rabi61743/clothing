@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -237,6 +238,44 @@ func (h *ProductHandler) InspectVectors(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+func (h *ProductHandler) ConciergeChat(w http.ResponseWriter, r *http.Request) {
+	var req models.ConciergeChatRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Message == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "valid message is required"})
+		return
+	}
+
+	// 1. Generate embedding vector for query
+	queryVector, err := h.embedService.GenerateEmbedding(r.Context(), req.Message)
+	var matchedProducts []models.Product
+	if err == nil {
+		results, err := h.repo.SearchSemantic(r.Context(), queryVector, 2, "")
+		if err == nil {
+			for _, r := range results {
+				matchedProducts = append(matchedProducts, r.Product)
+			}
+		}
+	}
+
+	// 2. Formulate luxury styling concierge response
+	var reply string
+	if len(matchedProducts) > 0 {
+		top := matchedProducts[0]
+		reply = fmt.Sprintf(
+			"Welcome to the Atelier. Based on your request, I highly recommend our %s from the %s collection ($%.2f). %s We suggest styling this with tailored footwear and a crisp poplin layer.",
+			top.Name, top.Brand, top.BasePrice, getStr(top.Description),
+		)
+	} else {
+		reply = "Welcome to the HUGO BOSS Digital Atelier. How may our master tailors assist you today with silhouettes, suiting fabrics, or sizing guidance?"
+	}
+
+	respondJSON(w, http.StatusOK, models.ConciergeChatResponse{
+		Reply:               reply,
+		RecommendedProducts: matchedProducts,
+	})
+}
+
+
 
 
 
@@ -245,3 +284,11 @@ func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
 }
+
+func getStr(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
+

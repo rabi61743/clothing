@@ -141,4 +141,14 @@ type AdminStats struct {
 	TotalEmbeddings   int     `json:"total_embeddings"`
 }
 
+type ConciergeChatRequest struct {
+	Message string `json:"message"`
+}
+
+type ConciergeChatResponse struct {
+	Reply               string    `json:"reply"`
+	RecommendedProducts []Product `json:"recommended_products,omitempty"`
+}
+
+
 

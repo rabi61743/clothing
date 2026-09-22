@@ -88,6 +88,7 @@ func main() {
 		r.Patch("/orders/{id}/status", productHandler.UpdateOrderStatus)
 		r.Get("/admin/stats", productHandler.GetAdminStats)
 		r.Get("/admin/vector/inspect", productHandler.InspectVectors)
+		r.Post("/concierge/chat", productHandler.ConciergeChat)
 	})
 
 	server := &http.Server{
