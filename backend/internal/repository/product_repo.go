@@ -392,3 +392,127 @@ func (r *ProductRepository) CreateOrder(ctx context.Context, req models.CreateOr
 	}, nil
 }
 
+func (r *ProductRepository) ListOrders(ctx context.Context, limit int) ([]models.Order, error) {
+	if limit <= 0 || limit > 100 {
+		limit = 20
+	}
+
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT id, order_number, customer_email, customer_name, shipping_address, total_amount, currency, status, created_at
+		FROM orders
+		ORDER BY created_at DESC
+		LIMIT $1
+	`, limit)
+	if err != nil {
+		return nil, fmt.Errorf("error querying orders: %w", err)
+	}
+	defer rows.Close()
+
+	var orders []models.Order
+	for rows.Next() {
+		var o models.Order
+		err := rows.Scan(&o.ID, &o.OrderNumber, &o.CustomerEmail, &o.CustomerName, &o.ShippingAddress, &o.TotalAmount, &o.Currency, &o.Status, &o.CreatedAt)
+		if err == nil {
+			orders = append(orders, o)
+		}
+	}
+
+	// Populate items
+	for i := range orders {
+		itemRows, err := r.db.Pool.Query(ctx, `
+			SELECT id, order_id, product_id, variant_sku, product_name, price, quantity
+			FROM order_items WHERE order_id = $1
+		`, orders[i].ID)
+		if err == nil {
+			for itemRows.Next() {
+				var it models.OrderItem
+				if err := itemRows.Scan(&it.ID, &it.OrderID, &it.ProductID, &it.VariantSKU, &it.ProductName, &it.Price, &it.Quantity); err == nil {
+					orders[i].Items = append(orders[i].Items, it)
+				}
+			}
+			itemRows.Close()
+		}
+	}
+
+	return orders, nil
+}
+
+func (r *ProductRepository) GetAdminStats(ctx context.Context) (*models.AdminStats, error) {
+	var stats models.AdminStats
+
+	_ = r.db.Pool.QueryRow(ctx, "SELECT COALESCE(SUM(total_amount), 0), COUNT(*) FROM orders").Scan(&stats.TotalRevenue, &stats.TotalOrders)
+	_ = r.db.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM products WHERE is_active = TRUE").Scan(&stats.TotalProducts)
+	_ = r.db.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM product_embeddings").Scan(&stats.TotalEmbeddings)
+
+	return &stats, nil
+}
+
+func (r *ProductRepository) CreateProduct(ctx context.Context, req models.CreateProductRequest, embedService *embedding.Service) (*models.Product, error) {
+	tx, err := r.db.Pool.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error starting transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	var productID uuid.UUID
+	var createdAt, updatedAt time.Time
+
+	var catID *uuid.UUID
+	if req.CategoryID != "" {
+		if parsed, err := uuid.Parse(req.CategoryID); err == nil {
+			catID = &parsed
+		}
+	}
+	if catID == nil {
+		defaultCat, _ := uuid.Parse("11111111-1111-1111-1111-111111111111")
+		catID = &defaultCat
+	}
+
+	err = tx.QueryRow(ctx, `
+		INSERT INTO products (sku, brand, name, slug, description, details, material_care, sustainability_note, category_id, base_price, currency, is_featured)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE)
+		RETURNING id, created_at, updated_at
+	`, req.SKU, req.Brand, req.Name, req.Slug, req.Description, req.Details, req.MaterialCare, req.SustainabilityNote, catID, req.BasePrice, req.Currency).Scan(&productID, &createdAt, &updatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("error inserting product: %w", err)
+	}
+
+	// Insert primary image
+	if req.ImageURL != "" {
+		_, _ = tx.Exec(ctx, `
+			INSERT INTO product_images (product_id, color_name, url, alt_text, display_order, is_primary)
+			VALUES ($1, $2, $3, $4, 1, TRUE)
+		`, productID, req.ColorName, req.ImageURL, req.Name)
+	}
+
+	// Insert variants for sizes
+	sizes := req.Sizes
+	if len(sizes) == 0 {
+		sizes = []string{"38R", "40R", "42R", "44R"}
+	}
+	for _, sz := range sizes {
+		vSKU := fmt.Sprintf("%s-%s", req.SKU, sz)
+		_, _ = tx.Exec(ctx, `
+			INSERT INTO product_variants (product_id, variant_sku, color_name, color_hex, size, stock_quantity)
+			VALUES ($1, $2, $3, $4, $5, 12)
+		`, productID, vSKU, req.ColorName, req.ColorHex, sz)
+	}
+
+	// Generate and store pgvector embedding
+	textToEmbed := fmt.Sprintf("%s %s. %s %s", req.Brand, req.Name, req.Description, req.Details)
+	vec, err := embedService.GenerateEmbedding(ctx, textToEmbed)
+	if err == nil {
+		_, _ = tx.Exec(ctx, `
+			INSERT INTO product_embeddings (product_id, embedding_type, embedding)
+			VALUES ($1, 'text_semantic', $2)
+		`, productID, vec)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("error committing product: %w", err)
+	}
+
+	return r.GetProductBySlug(ctx, req.Slug)
+}
+
+

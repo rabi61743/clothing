@@ -146,6 +146,56 @@ func (h *ProductHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, order)
 }
 
+func (h *ProductHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	orders, err := h.repo.ListOrders(r.Context(), limit)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, map[string]interface{}{
+		"count":  len(orders),
+		"orders": orders,
+	})
+}
+
+func (h *ProductHandler) GetAdminStats(w http.ResponseWriter, r *http.Request) {
+	stats, err := h.repo.GetAdminStats(r.Context())
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, stats)
+}
+
+func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
+	var req models.CreateProductRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid product payload"})
+		return
+	}
+
+	if req.Name == "" || req.SKU == "" || req.BasePrice <= 0 {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "name, sku, and valid base_price are required"})
+		return
+	}
+
+	if req.Slug == "" {
+		req.Slug = req.SKU
+	}
+
+	product, err := h.repo.CreateProduct(r.Context(), req, h.embedService)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed creating product: " + err.Error()})
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, product)
+}
+
+
 
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")

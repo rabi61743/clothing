@@ -804,6 +804,11 @@ export default function Storefront() {
               <li>Golang 1.24 High-Throughput REST</li>
               <li>PostgreSQL 16 + pgvector HNSW</li>
               <li>Containerized with Docker</li>
+              <li className="pt-2">
+                <Link href="/admin" className="text-amber-400 hover:underline flex items-center gap-1 font-sans text-xs">
+                  <span>Atelier Admin Console →</span>
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

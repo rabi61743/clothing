@@ -79,10 +79,13 @@ func main() {
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/health", productHandler.HealthCheck)
 		r.Get("/products", productHandler.ListProducts)
+		r.Post("/products", productHandler.CreateProduct)
 		r.Get("/products/{slug}", productHandler.GetProductBySlug)
 		r.Get("/products/{id}/similar", productHandler.GetSimilarProducts)
 		r.Post("/search/semantic", productHandler.SearchSemantic)
+		r.Get("/orders", productHandler.ListOrders)
 		r.Post("/orders", productHandler.CreateOrder)
+		r.Get("/admin/stats", productHandler.GetAdminStats)
 	})
 
 	server := &http.Server{

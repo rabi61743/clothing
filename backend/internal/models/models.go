@@ -116,3 +116,29 @@ type CreateOrderRequest struct {
 	} `json:"items"`
 }
 
+type CreateProductRequest struct {
+	SKU                string   `json:"sku"`
+	Brand              string   `json:"brand"`
+	Name               string   `json:"name"`
+	Slug               string   `json:"slug"`
+	Description        string   `json:"description"`
+	Details            string   `json:"details"`
+	MaterialCare       string   `json:"material_care"`
+	SustainabilityNote string   `json:"sustainability_note"`
+	CategoryID         string   `json:"category_id"`
+	BasePrice          float64  `json:"base_price"`
+	Currency           string   `json:"currency"`
+	ImageURL           string   `json:"image_url"`
+	ColorName          string   `json:"color_name"`
+	ColorHex           string   `json:"color_hex"`
+	Sizes              []string `json:"sizes"`
+}
+
+type AdminStats struct {
+	TotalRevenue      float64 `json:"total_revenue"`
+	TotalOrders       int     `json:"total_orders"`
+	TotalProducts     int     `json:"total_products"`
+	TotalEmbeddings   int     `json:"total_embeddings"`
+}
+
+
