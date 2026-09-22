@@ -1,0 +1,19 @@
+# Environment
+.env
+.env.local
+
+# Dependencies
+node_modules/
+backend/bin/
+
+# Build artifacts
+.next/
+frontend/.next/
+frontend/out/
+
+# Database data
+pgdata/
+
+# OS / Editor
+.DS_Store
+*.log

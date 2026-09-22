@@ -1,0 +1,66 @@
+services:
+  # 1. PostgreSQL 16 with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: clothing_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: clothing_user
+      POSTGRES_PASSWORD: clothing_password
+      POSTGRES_DB: clothing_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clothing_user -d clothing_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clothing_net
+
+  # 2. Golang High-Throughput REST API with pgvector similarity search
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clothing_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgres://clothing_user:clothing_password@postgres:5432/clothing_db?sslmode=disable"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - clothing_net
+
+  # 3. Next.js Luxury E-Commerce Storefront
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clothing_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"
+      INTERNAL_API_URL: "http://backend:8080"
+    depends_on:
+      - backend
+    networks:
+      - clothing_net
+
+volumes:
+  pgdata:
+
+networks:
+  clothing_net:
+    driver: bridge
