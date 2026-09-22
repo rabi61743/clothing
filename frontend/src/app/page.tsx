@@ -794,7 +794,11 @@ export default function Storefront() {
               <li>Complimentary Shipping & Returns</li>
               <li>Store Locator</li>
               <li>Size & Fit Intelligence</li>
-              <li>Track Your Order</li>
+              <li>
+                <Link href="/tracking" className="text-neutral-300 hover:text-white underline underline-offset-2">
+                  Track Your Order →
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

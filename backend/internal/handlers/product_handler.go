@@ -275,6 +275,27 @@ func (h *ProductHandler) ConciergeChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h *ProductHandler) GetOrderByNumber(w http.ResponseWriter, r *http.Request) {
+	orderNumber := chi.URLParam(r, "orderNumber")
+	if orderNumber == "" {
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "orderNumber parameter is required"})
+		return
+	}
+
+	order, err := h.repo.GetOrderByNumber(r.Context(), orderNumber)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+	if order == nil {
+		respondJSON(w, http.StatusNotFound, map[string]string{"error": "order not found"})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, order)
+}
+
+
 
 
 

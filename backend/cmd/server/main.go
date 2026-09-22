@@ -86,6 +86,7 @@ func main() {
 		r.Get("/orders", productHandler.ListOrders)
 		r.Post("/orders", productHandler.CreateOrder)
 		r.Patch("/orders/{id}/status", productHandler.UpdateOrderStatus)
+		r.Get("/orders/track/{orderNumber}", productHandler.GetOrderByNumber)
 		r.Get("/admin/stats", productHandler.GetAdminStats)
 		r.Get("/admin/vector/inspect", productHandler.InspectVectors)
 		r.Post("/concierge/chat", productHandler.ConciergeChat)

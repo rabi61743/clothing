@@ -561,5 +561,38 @@ func (r *ProductRepository) InspectVectors(ctx context.Context) ([]VectorInspect
 	return items, nil
 }
 
+func (r *ProductRepository) GetOrderByNumber(ctx context.Context, orderNumber string) (*models.Order, error) {
+	var o models.Order
+	err := r.db.Pool.QueryRow(ctx, `
+		SELECT id, order_number, customer_email, customer_name, shipping_address, total_amount, currency, status, created_at
+		FROM orders
+		WHERE UPPER(order_number) = UPPER($1)
+	`, orderNumber).Scan(&o.ID, &o.OrderNumber, &o.CustomerEmail, &o.CustomerName, &o.ShippingAddress, &o.TotalAmount, &o.Currency, &o.Status, &o.CreatedAt)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error querying order: %w", err)
+	}
+
+	// Fetch items
+	itemRows, err := r.db.Pool.Query(ctx, `
+		SELECT id, order_id, product_id, variant_sku, product_name, price, quantity
+		FROM order_items WHERE order_id = $1
+	`, o.ID)
+	if err == nil {
+		for itemRows.Next() {
+			var it models.OrderItem
+			if err := itemRows.Scan(&it.ID, &it.OrderID, &it.ProductID, &it.VariantSKU, &it.ProductName, &it.Price, &it.Quantity); err == nil {
+				o.Items = append(o.Items, it)
+			}
+		}
+		itemRows.Close()
+	}
+
+	return &o, nil
+}
+
+
 
 
