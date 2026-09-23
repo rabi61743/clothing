@@ -8,16 +8,17 @@ A modern luxury clothing web platform inspired by the visual design, UX patterns
 
 | Service | Public Live URL | Platform | Plan |
 | :--- | :--- | :--- | :--- |
-| **Storefront (Frontend)** | [https://clothing-frontend-pzkq.onrender.com](https://clothing-frontend-pzkq.onrender.com) | Render | Free Web Service |
+| **Storefront (Primary Edge)** | [https://frontend-rabi-abd5.vercel.app](https://frontend-rabi-abd5.vercel.app) (or [lyart-alpha](https://frontend-lyart-alpha-44.vercel.app)) | **Vercel** | Free Hobby (Global Edge CDN) |
+| **Storefront (Secondary)** | [https://clothing-frontend-pzkq.onrender.com](https://clothing-frontend-pzkq.onrender.com) | Render | Free Web Service |
 | **API Backend (Golang)** | [https://clothing-backend-96ai.onrender.com](https://clothing-backend-96ai.onrender.com) | Render | Free Docker Web Service |
 | **Database (PostgreSQL + pgvector)** | `oregon-postgres.render.com:5432` | Render | Managed Free PostgreSQL 16 |
 
-### Live Portal Features
-- **Luxury Storefront:** [Catalog / PLP](https://clothing-frontend-pzkq.onrender.com/products)
-- **AI Outfit Studio:** [Personal Stylist Studio](https://clothing-frontend-pzkq.onrender.com/stylist)
-- **Split-Screen PDP:** [Two-Piece Slim-Fit Suit](https://clothing-frontend-pzkq.onrender.com/products/two-piece-slim-fit-suit-italian-virgin-wool)
-- **Atelier Admin Command Center:** [Admin Ops & Vector Sandbox](https://clothing-frontend-pzkq.onrender.com/admin)
-- **Client Order Tracking:** [Real-Time Fulfillment Timeline](https://clothing-frontend-pzkq.onrender.com/tracking)
+### Live Portal Features (Vercel)
+- **Luxury Storefront:** [Catalog / PLP](https://frontend-rabi-abd5.vercel.app/products)
+- **AI Outfit Studio:** [Personal Stylist Studio](https://frontend-rabi-abd5.vercel.app/stylist)
+- **Split-Screen PDP:** [Two-Piece Slim-Fit Suit](https://frontend-rabi-abd5.vercel.app/products/two-piece-slim-fit-suit-italian-virgin-wool)
+- **Atelier Admin Command Center:** [Admin Ops & Vector Sandbox](https://frontend-rabi-abd5.vercel.app/admin)
+- **Client Order Tracking:** [Real-Time Fulfillment Timeline](https://frontend-rabi-abd5.vercel.app/tracking)
 - **AI Concierge:** Floating interactive style advisor on all storefront pages
 
 ---
