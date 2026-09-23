@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ChevronRight
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface OutfitItem {
   category: string;
@@ -147,7 +148,7 @@ export default function StylistStudioPage() {
     setIsGenerating(true);
     try {
       // Query pgvector backend semantic search for top items matching the occasion
-      const res = await fetch("http://localhost:8080/api/search/semantic", {
+      const res = await fetch(`${API_BASE_URL}/api/search/semantic`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: customPrompt, limit: 3 })

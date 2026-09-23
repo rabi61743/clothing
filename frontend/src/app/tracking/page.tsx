@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   FileText
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface OrderItem {
   id: string;
@@ -56,7 +57,7 @@ function TrackingContent() {
     setSearched(true);
 
     try {
-      const res = await fetch(`http://localhost:8080/api/orders/track/${num.trim()}`);
+      const res = await fetch(`${API_BASE_URL}/api/orders/track/${num.trim()}`);
       if (res.ok) {
         const data: Order = await res.json();
         setOrder(data);

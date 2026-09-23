@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   Sparkles
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/orders", {
+      const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

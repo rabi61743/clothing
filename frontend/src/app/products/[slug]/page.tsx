@@ -19,6 +19,7 @@ import {
   RefreshCw,
   X
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface ProductImage {
   id: string;
@@ -94,7 +95,7 @@ export default function ProductDetailPage() {
     async function fetchProduct() {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:8080/api/products/${slug}`);
+        const res = await fetch(`${API_BASE_URL}/api/products/${slug}`);
         if (res.ok) {
           const data: Product = await res.json();
           setProduct(data);
@@ -107,7 +108,7 @@ export default function ProductDetailPage() {
           }
 
           // Fetch pgvector similar items
-          const simRes = await fetch(`http://localhost:8080/api/products/${data.id}/similar?limit=4`);
+          const simRes = await fetch(`${API_BASE_URL}/api/products/${data.id}/similar?limit=4`);
           if (simRes.ok) {
             const simData = await simRes.json();
             setSimilarItems(simData.similar || []);

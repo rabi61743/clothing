@@ -15,6 +15,7 @@ import {
   Check, 
   ChevronDown 
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface ProductImage {
   id: string;
@@ -63,7 +64,7 @@ function CatalogContent() {
     async function loadProducts() {
       setLoading(true);
       try {
-        let url = "http://localhost:8080/api/products";
+        let url = `${API_BASE_URL}/api/products`;
         const params = new URLSearchParams();
         if (activeBrand !== "ALL") params.append("brand", activeBrand);
         if (activeCategory) params.append("category", activeCategory);

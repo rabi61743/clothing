@@ -13,6 +13,7 @@ import {
   User,
   ShoppingBag
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface Product {
   id: string;
@@ -60,7 +61,7 @@ export default function AiConcierge() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/concierge/chat", {
+      const res = await fetch(`${API_BASE_URL}/api/concierge/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userText }),

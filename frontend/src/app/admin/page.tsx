@@ -22,6 +22,7 @@ import {
   Check,
   Search
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface Order {
   id: string;
@@ -96,9 +97,9 @@ export default function AtelierAdminDashboard() {
     setLoading(true);
     try {
       const [statsRes, ordersRes, vectorsRes] = await Promise.all([
-        fetch("http://localhost:8080/api/admin/stats"),
-        fetch("http://localhost:8080/api/orders?limit=25"),
-        fetch("http://localhost:8080/api/admin/vector/inspect"),
+        fetch(`${API_BASE_URL}/api/admin/stats`),
+        fetch(`${API_BASE_URL}/api/orders?limit=25`),
+        fetch(`${API_BASE_URL}/api/admin/vector/inspect`),
       ]);
 
       if (statsRes.ok) {
@@ -126,7 +127,7 @@ export default function AtelierAdminDashboard() {
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -148,7 +149,7 @@ export default function AtelierAdminDashboard() {
     setIsTestingVector(true);
     const start = performance.now();
     try {
-      const res = await fetch("http://localhost:8080/api/search/semantic", {
+      const res = await fetch(`${API_BASE_URL}/api/search/semantic`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: sandboxQuery, limit: 5 }),
@@ -173,7 +174,7 @@ export default function AtelierAdminDashboard() {
     setCreatedProductSuccess(null);
 
     try {
-      const res = await fetch("http://localhost:8080/api/products", {
+      const res = await fetch(`${API_BASE_URL}/api/products`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

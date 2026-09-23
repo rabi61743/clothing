@@ -15,6 +15,7 @@ import {
   SlidersHorizontal,
   Layers
 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface ProductImage {
   id: string;
@@ -169,8 +170,8 @@ export default function Storefront() {
     async function loadProducts() {
       try {
         const url = activeBrand === "ALL" 
-          ? "http://localhost:8080/api/products" 
-          : `http://localhost:8080/api/products?brand=${activeBrand}`;
+          ? `${API_BASE_URL}/api/products` 
+          : `${API_BASE_URL}/api/products?brand=${activeBrand}`;
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
@@ -197,7 +198,7 @@ export default function Storefront() {
 
     setIsSearching(true);
     try {
-      const res = await fetch("http://localhost:8080/api/search/semantic", {
+      const res = await fetch(`${API_BASE_URL}/api/search/semantic`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -264,7 +265,7 @@ export default function Storefront() {
             PostgreSQL + pgvector Connected
           </span>
           <span>•</span>
-          <span>Golang API :8080</span>
+          <span>Golang API Active</span>
         </div>
       </div>
 
