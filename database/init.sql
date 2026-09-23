@@ -84,7 +84,10 @@ INSERT INTO categories (id, name, slug, description) VALUES
 ('11111111-1111-1111-1111-111111111111', 'Suits & Tailoring', 'suits-tailoring', 'Crafted Italian virgin wool two-piece and three-piece suits'),
 ('22222222-2222-2222-2222-222222222222', 'Shirts', 'shirts', 'Egyptian cotton dress shirts and casual woven button-downs'),
 ('33333333-3333-3333-3333-333333333333', 'Jackets & Coats', 'jackets-coats', 'Tailored overcoats, blazers, and luxury outerwear'),
-('44444444-4444-4444-4444-444444444444', 'Shoes', 'shoes', 'Italian leather oxfords, monk straps, and minimalist sneakers')
+('44444444-4444-4444-4444-444444444444', 'Shoes', 'shoes', 'Italian leather oxfords, monk straps, and minimalist sneakers'),
+('55555555-5555-5555-5555-555555555555', 'Fragrance & Grooming', 'fragrance-grooming', 'Signature elixirs, parmums, and luxury grooming essentials'),
+('66666666-6666-6666-6666-666666666666', 'Accessories & Watches', 'accessories-watches', 'Swiss chronographs, leather belts, and cufflinks'),
+('77777777-7777-7777-7777-777777777777', 'Trousers', 'trousers', 'Tailored slacks, chinos, and technical streetwear utility trousers')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Seed Products
@@ -163,6 +166,66 @@ INSERT INTO products (id, sku, brand, name, slug, description, details, material
     228.00,
     'USD',
     TRUE
+),
+(
+    'ffffffff-ffff-ffff-ffff-ffffffffffff',
+    'HB-FRAG-001',
+    'BOSS',
+    'BOSS Bottled Elixir Parfum Intense 100ml',
+    'boss-bottled-elixir-parfum-intense',
+    'An intense, sophisticated ambery woody fragrance that radiates confidence and contemporary masculinity. Features notes of warm incense, cardamom, earthy patchouli, and rich cedarwood essence.',
+    '100ml Eau de Parfum Intense; Signature flacon with double-lacquered deep-black finish and gold branding; Magnetic cap.',
+    'Keep in a cool, dry place away from direct sunlight.',
+    'Crafted with responsibly sourced natural essences and recyclable glass bottle.',
+    '55555555-5555-5555-5555-555555555555',
+    145.00,
+    'USD',
+    TRUE
+),
+(
+    '11111111-2222-3333-4444-555555555555',
+    'HB-SHOE-001',
+    'BOSS',
+    'Cap-Toe Oxford Shoes in Italian Burnished Calfskin',
+    'cap-toe-oxford-shoes-italian-calfskin',
+    'Exquisite formal lace-up Oxford shoes crafted in Italy from full-grain calfskin leather, hand-burnished to achieve a rich depth of color. Finished with a durable Blake-stitched leather sole and subtle embossed monogram.',
+    'Closed lacing with 5 eyelets; Chiselled cap toe; Blake-stitched leather sole with rubber heel insert; Soft cognac leather lining; Handcrafted in Italy.',
+    '100% Calfskin Upper. Leather sole. Clean with soft cloth; Nourish with high-grade beeswax polish.',
+    'Leather sourced from Leather Working Group (LWG) Gold-Rated Italian tanneries.',
+    '44444444-4444-4444-4444-444444444444',
+    495.00,
+    'USD',
+    TRUE
+),
+(
+    '22222222-3333-4444-5555-666666666666',
+    'HB-WATCH-001',
+    'BOSS',
+    'Black Dial Automatic Chronograph with Ceramic Bezel',
+    'black-dial-automatic-chronograph-ceramic',
+    'An architectural Swiss-engineered chronograph combining athletic dynamism and timeless black-tie refinement. Engineered with a scratch-resistant black ceramic tachymeter bezel, sunray brushed dial, and an integrated stainless-steel bracelet.',
+    '44mm 316L stainless steel case; Swiss automatic movement with 48h power reserve; 10 ATM water resistance; Sapphire crystal with anti-reflective coating.',
+    'Rinse with fresh water after saltwater exposure; Annual gasket check recommended.',
+    'Manufactured using 80% recycled medical-grade stainless steel.',
+    '66666666-6666-6666-6666-666666666666',
+    795.00,
+    'USD',
+    TRUE
+),
+(
+    '33333333-4444-5555-6666-777777777777',
+    'HG-CARGO-001',
+    'HUGO',
+    'Relaxed-Fit Cargo Trousers in Technical Ripstop',
+    'relaxed-fit-cargo-trousers-technical-ripstop',
+    'Progressive streetwear trousers engineered from high-tenacity matte ripstop. Features asymmetrical bellows cargo pockets, articulated knee darts, and red logo accent pull-tabs.',
+    'Relaxed silhouette; Elasticated bungee drawcord waist; 6 utility pockets; Adjustable ankle cinches; Water-repellent finish.',
+    '100% Recycled Polyamide Ripstop. Machine wash cold; Hang dry.',
+    'Certified Recycled Ocean-bound Plastic Polyamide.',
+    '77777777-7777-7777-7777-777777777777',
+    248.00,
+    'USD',
+    TRUE
 )
 ON CONFLICT (slug) DO NOTHING;
 
@@ -180,7 +243,11 @@ INSERT INTO product_variants (product_id, variant_sku, color_name, color_hex, si
 ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'HB-COAT-001-CML-40R', 'Camel', '#C4A076', '40R', 7),
 ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'HB-COAT-001-BLK-40R', 'Black', '#111111', '40R', 9),
 ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'HG-HOOD-001-BLK-M', 'Black / Red', '#000000', 'M', 20),
-('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'HG-HOOD-001-BLK-L', 'Black / Red', '#000000', 'L', 15)
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'HG-HOOD-001-BLK-L', 'Black / Red', '#000000', 'L', 15),
+('ffffffff-ffff-ffff-ffff-ffffffffffff', 'HB-FRAG-001-100ML', 'Amber Gold', '#D4AF37', '100ml', 35),
+('11111111-2222-3333-4444-555555555555', 'HB-SHOE-001-COG-42', 'Cognac Brown', '#8B4513', '42 EU / 9 US', 10),
+('22222222-3333-4444-5555-666666666666', 'HB-WATCH-001-STEEL-44', 'Brushed Steel', '#222222', 'One Size (44mm)', 8),
+('33333333-4444-5555-6666-777777777777', 'HG-CARGO-001-BLK-32', 'Pitch Black', '#0D0D0D', '32W', 18)
 ON CONFLICT (variant_sku) DO NOTHING;
 
 -- Seed Images
@@ -190,7 +257,11 @@ INSERT INTO product_images (product_id, color_name, url, alt_text, display_order
 ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Deep Black', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=85&w=1200&h=1600', 'Double-Breasted Tuxedo in Virgin Wool with Silk Trims', 1, TRUE),
 ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Optical White', 'https://images.unsplash.com/photo-1620012253295-c15c429f6f60?auto=format&fit=crop&q=85&w=1200&h=1600', 'Slim-Fit Dress Shirt in Structured Cotton Poplin', 1, TRUE),
 ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Camel', 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=85&w=1200&h=1600', 'Single-Breasted Overcoat in Cashmere-Blend Wool in Camel', 1, TRUE),
-('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Black / Red', 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&q=85&w=1200&h=1600', 'Oversized Logo Hoodie in Heavy French Terry', 1, TRUE);
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Black / Red', 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&q=85&w=1200&h=1600', 'Oversized Logo Hoodie in Heavy French Terry', 1, TRUE),
+('ffffffff-ffff-ffff-ffff-ffffffffffff', 'Amber Gold', 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=85&w=1200&h=1600', 'BOSS Bottled Elixir Parfum Intense bottle front view', 1, TRUE),
+('11111111-2222-3333-4444-555555555555', 'Cognac Brown', 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&q=85&w=1200&h=1600', 'Cap-Toe Oxford Shoes in Italian Burnished Calfskin side profile', 1, TRUE),
+('22222222-3333-4444-5555-666666666666', 'Brushed Steel', 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=85&w=1200&h=1600', 'Black Dial Automatic Chronograph watch face and steel bracelet', 1, TRUE),
+('33333333-4444-5555-6666-777777777777', 'Pitch Black', 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=85&w=1200&h=1600', 'Relaxed-Fit Cargo Trousers in Technical Ripstop full length', 1, TRUE);
 
 -- Orders
 CREATE TABLE IF NOT EXISTS orders (
