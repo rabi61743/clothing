@@ -16,6 +16,7 @@ import {
   Layers
 } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
+import { useCart } from "@/context/CartContext";
 
 interface ProductImage {
   id: string;
@@ -160,9 +161,7 @@ export default function Storefront() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SemanticSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<{ product: Product; size: string }[]>([]);
+  const { addItem, openCart, cartCount } = useCart();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Fetch live products from Go backend
@@ -224,9 +223,16 @@ export default function Storefront() {
   };
 
   const addToCart = (product: Product, size = "40R") => {
-    setCartItems(prev => [...prev, { product, size }]);
-    setCartCount(prev => prev + 1);
-    setCartOpen(true);
+    addItem({
+      productId: product.id,
+      variantSku: `${product.sku}-${size}`,
+      name: product.name,
+      brand: product.brand,
+      price: product.base_price,
+      size,
+      color: "Signature Tone",
+      imageUrl: product.images?.[0]?.url || "https://images.unsplash.com/photo-1594938298603-c8148c4dae35",
+    });
   };
 
   const filteredProducts = activeBrand === "ALL" 
@@ -305,7 +311,7 @@ export default function Storefront() {
             </button>
 
             <button 
-              onClick={() => setCartOpen(true)} 
+              onClick={openCart} 
               className="relative p-2 hover:bg-neutral-100 rounded-full transition-colors"
               aria-label="Shopping Bag"
             >
@@ -703,75 +709,6 @@ export default function Storefront() {
                   Add to Shopping Bag • ${selectedProduct.base_price}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 8. SLIDE-OUT SHOPPING BAG DRAWER */}
-      {cartOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
-          <div className="bg-white w-full max-w-md h-full p-8 flex flex-col justify-between shadow-2xl animate-in slide-in-from-right duration-300">
-            <div>
-              <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
-                <h3 className="font-bold text-lg uppercase tracking-wider flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  Shopping Bag ({cartCount})
-                </h3>
-                <button 
-                  onClick={() => setCartOpen(false)}
-                  className="p-2 hover:bg-neutral-100 rounded-full"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Free Shipping Meter */}
-              <div className="py-4 border-b border-neutral-100">
-                <div className="flex items-center justify-between text-xs font-medium mb-1.5">
-                  <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5" /> Free Express Delivery Unlocked
-                  </span>
-                  <span>100%</span>
-                </div>
-                <div className="w-full h-1.5 bg-neutral-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-600 w-full" />
-                </div>
-              </div>
-
-              {/* Items List */}
-              <div className="py-6 space-y-4 max-h-[50vh] overflow-y-auto">
-                {cartItems.map((item, idx) => (
-                  <div key={idx} className="flex gap-4 border-b border-neutral-100 pb-4">
-                    <div className="relative w-16 h-20 bg-neutral-100 flex-shrink-0">
-                      <Image
-                        src={item.product.images?.[0]?.url || "https://images.unsplash.com/photo-1594938298603-c8148c4dae35"}
-                        alt={item.product.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 text-xs">
-                      <span className="font-bold uppercase tracking-wider text-neutral-400">{item.product.brand}</span>
-                      <h4 className="font-bold text-sm mt-0.5">{item.product.name}</h4>
-                      <p className="text-neutral-500 mt-1">Size: {item.size}</p>
-                      <div className="font-bold mt-2">${item.product.base_price}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-neutral-200">
-              <div className="flex items-center justify-between text-sm font-bold uppercase mb-4">
-                <span>Subtotal</span>
-                <span>
-                  ${cartItems.reduce((acc, curr) => acc + curr.product.base_price, 0).toLocaleString()}
-                </span>
-              </div>
-              <button className="w-full bg-black text-white py-4 uppercase tracking-widest text-xs font-bold hover:bg-neutral-800 transition-colors">
-                Proceed to Checkout
-              </button>
             </div>
           </div>
         </div>

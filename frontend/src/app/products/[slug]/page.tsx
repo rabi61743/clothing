@@ -20,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
+import { useCart } from "@/context/CartContext";
 
 interface ProductImage {
   id: string;
@@ -69,7 +70,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [cartOpen, setCartOpen] = useState(false);
+  const { addItem, openCart, cartCount } = useCart();
   const [fitModalOpen, setFitModalOpen] = useState(false);
   
   // Fit advisor state
@@ -175,10 +176,16 @@ export default function ProductDetailPage() {
           </Link>
 
           <button 
-            onClick={() => setCartOpen(true)}
+            onClick={openCart}
             className="relative p-2 hover:bg-neutral-100 rounded-full transition-colors"
+            aria-label="Open Shopping Bag"
           >
             <ShoppingBag className="w-5 h-5" />
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-black text-white text-[10px] font-mono font-bold rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
       </header>
@@ -316,7 +323,22 @@ export default function ProductDetailPage() {
               {/* Primary Call to Action */}
               <div className="pt-2 space-y-3">
                 <button
-                  onClick={() => setCartOpen(true)}
+                  onClick={() => {
+                    const variantSku = product.variants?.find(
+                      (v) => v.size === selectedSize && v.color_name === selectedColor
+                    )?.variant_sku || `${product.sku}-${selectedColor || "BLK"}-${selectedSize || "40R"}`;
+
+                    addItem({
+                      productId: product.id,
+                      variantSku,
+                      name: product.name,
+                      brand: product.brand,
+                      price: product.base_price,
+                      size: selectedSize || "40R",
+                      color: selectedColor || "Signature Tone",
+                      imageUrl: selectedImage || product.images?.[0]?.url || "https://images.unsplash.com/photo-1594938298603-c8148c4dae35",
+                    });
+                  }}
                   className="w-full bg-black text-white py-4 uppercase tracking-widest text-xs font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
                 >
                   <ShoppingBag className="w-4 h-4" />
@@ -550,52 +572,6 @@ export default function ProductDetailPage() {
                   Apply Size {recommendedSize || "40R"}
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 6. SLIDE-OUT CART DRAWER */}
-      {cartOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
-          <div className="bg-white w-full max-w-md h-full p-8 flex flex-col justify-between shadow-2xl animate-in slide-in-from-right duration-300">
-            <div>
-              <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
-                <h3 className="font-bold text-lg uppercase tracking-wider flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  Shopping Bag (1)
-                </h3>
-                <button onClick={() => setCartOpen(false)} className="p-2 hover:bg-neutral-100 rounded-full">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="py-6 border-b border-neutral-100 flex gap-4">
-                <div className="relative w-20 h-28 bg-neutral-100 flex-shrink-0">
-                  <Image
-                    src={selectedImage || product.images?.[0]?.url || "https://images.unsplash.com/photo-1594938298603-c8148c4dae35"}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex-1 text-xs">
-                  <span className="font-bold uppercase tracking-wider text-neutral-400">{product.brand}</span>
-                  <h4 className="font-bold text-sm mt-0.5">{product.name}</h4>
-                  <p className="text-neutral-500 mt-1">Color: {selectedColor || "Dark Navy"} • Size: {selectedSize || "40R"}</p>
-                  <div className="font-bold text-sm mt-3">${product.base_price.toLocaleString()}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-neutral-200">
-              <div className="flex items-center justify-between text-sm font-bold uppercase mb-4">
-                <span>Subtotal</span>
-                <span>${product.base_price.toLocaleString()} USD</span>
-              </div>
-              <button className="w-full bg-black text-white py-4 uppercase tracking-widest text-xs font-bold hover:bg-neutral-800 transition-colors">
-                Proceed to Checkout
-              </button>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
+import { useCart } from "@/context/CartContext";
 
 interface OutfitItem {
   category: string;
@@ -131,6 +132,7 @@ const PRESET_OUTFITS: OutfitPreset[] = [
 
 export default function StylistStudioPage() {
   const router = useRouter();
+  const { addItem, openCart, cartCount } = useCart();
 
   const [activePreset, setActivePreset] = useState<OutfitPreset>(PRESET_OUTFITS[0]);
   const [customPrompt, setCustomPrompt] = useState("");
@@ -185,10 +187,23 @@ export default function StylistStudioPage() {
   };
 
   const handleAddLookToBag = () => {
+    activePreset.items.forEach((garment, idx) => {
+      addItem({
+        productId: `stylist-item-${idx}-${garment.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+        variantSku: `HB-STY-${idx}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+        name: garment.name,
+        brand: garment.brand,
+        price: garment.price,
+        size: "40R",
+        color: garment.color,
+        imageUrl: garment.image,
+      });
+    });
     setAddedSuccess(true);
     setTimeout(() => {
-      router.push("/checkout");
-    }, 800);
+      setAddedSuccess(false);
+      openCart();
+    }, 400);
   };
 
   return (
@@ -211,12 +226,18 @@ export default function StylistStudioPage() {
             </span>
           </Link>
 
-          <Link 
-            href="/checkout"
+          <button 
+            onClick={openCart}
             className="relative p-2 hover:bg-neutral-100 rounded-full transition-colors"
+            aria-label="Open Shopping Bag"
           >
             <ShoppingBag className="w-5 h-5" />
-          </Link>
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-black text-white text-[10px] font-mono font-bold rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
